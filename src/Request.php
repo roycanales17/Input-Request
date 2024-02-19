@@ -10,7 +10,7 @@
 			$this->setInputProperty();
 		}
 		
-		public function matched( string $key, mixed $value ): bool {
+		public function isMatched( string $key, mixed $value ): bool {
 			return $this->input( $key ) === $value;
 		}
 		

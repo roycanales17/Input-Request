@@ -58,7 +58,6 @@ This PHP class is designed to handle HTTP requests and provide validation and er
 
 ## Available Methods
 
-- `matched(string $key, mixed $value): bool`: Check if the input value matches the specified value.
 - `inputs(): array`: Get all input values.
 - `input(string $name): mixed`: Get the value of a specific input.
 - `has(string $key): bool`: Check if an input exists.
@@ -67,6 +66,7 @@ This PHP class is designed to handle HTTP requests and provide validation and er
 - `except(array $input_keys): array`: Get all input values except the specified keys.
 - `errors(bool $force_all = false): array`: Get validation errors.
 - `error(string $key): mixed`: Get the error message for a specific input key.
+- `isMatched(string $key, mixed $value): bool`: Check if the input value matches the specified value.
 - `isSuccess(): bool`: Check if validation was successful.
 - `isFailed(): bool`: Check if validation failed.
 - `validate(array $array): self`: Set validation rules.

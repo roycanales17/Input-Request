@@ -23,7 +23,7 @@
 		protected array $request = [];
 		
 		# Required rules to have values.
-		protected array $required_rules_values = [ 'max', 'min', 'extension', 'mimes' ];
+		protected array $required_rules_values = [ 'max', 'min', 'extension', 'mimes', 'dimensions' ];
 		
 		# Prohibited rules from the $_FILES input.
 		protected array $excluded_files_rules = [ 'null', 'numeric', 'integer', 'string', 'email', 'password', 'confirmed' ];

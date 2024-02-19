@@ -4,7 +4,7 @@
 
     $req = new App\Http\Requests\Request();
     
-    if ( $req->matched( 'submit', 'Login' ) )
+    if ( $req->isMatched( 'submit', 'Login' ) )
     {
         $req->validate([
             'email' => 'required|email',
