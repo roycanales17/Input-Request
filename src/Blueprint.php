@@ -159,9 +159,6 @@
 					}
 				}
 			}
-			
-			$this->validate = [];
-			$this->message = [];
 		}
 		
 		protected function getResponse(): array {
@@ -218,6 +215,11 @@
 				
 			if ( !is_null( $input_key ) )
 				$this->response[ $key."[$input_key]" ] = $message;
+		}
+
+		protected function resetProperty(): void {
+			$this->validate = [];
+			$this->message = [];
 		}
 
 		protected function setValidateProperty( array $array ): void {

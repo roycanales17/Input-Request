@@ -10,10 +10,6 @@
 			$this->setInputProperty();
 		}
 		
-		public function isMatched( string $key, mixed $value ): bool {
-			return $this->input( $key ) === $value;
-		}
-		
 		public function inputs(): array {
 			return $this->getInput();
 		}
@@ -75,6 +71,10 @@
 			return $res[ $key ] ?? "";
 		}
 		
+		public function isMatched( string $key, mixed $value ): bool {
+			return $this->input( $key ) === $value;
+		}
+
 		public function isSuccess(): bool
 		{
 			$this->startValidate();
@@ -89,6 +89,7 @@
 		
 		public function validate( array $array ): self
 		{
+			$this->resetProperty();
 			$this->setValidateProperty( $array );
 			return $this;
 		}
