@@ -17,7 +17,7 @@ This PHP class is designed to handle HTTP requests and provide validation and er
    ```php
    $request = new Request();
 
-   # Access request data: Use the input(), inputs(), has(), method(), only(), and except() methods to access request data.
+   # Access request data: Use the input(), json(), query(), file(), post(), inputs(), has(), method(), only(), and except() methods to access request data.
    $email = $request->input('email');
    $inputs = $request->inputs();
    $hasEmail = $request->has('email');

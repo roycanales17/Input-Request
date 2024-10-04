@@ -6,8 +6,7 @@
 	{	
 		function __construct()
 		{
-			$this->setInputRequest();
-			$this->setInputProperty();
+			$this->setInputPayload();
 		}
 		
 		public function inputs(): array {
@@ -17,6 +16,30 @@
 		public function input( string $name ): mixed {
 			return $this->getInput( $name );
 		}
+
+        public function query( string $name ): mixed
+        {
+            $get = $this->inputPayload( 'GET' );
+            return $get[ strtolower( $name ) ] ?? '';
+        }
+
+        public function post( string $name ): mixed
+        {
+            $post = $this->inputPayload( 'POST' );
+            return $post[ strtolower( $name ) ] ?? '';
+        }
+
+        public function json( string $name ): mixed
+        {
+            $json = $this->inputPayload( 'JSON' );
+            return $json[ strtolower( $name ) ] ?? '';
+        }
+
+        public function file( string $name ): mixed
+        {
+            $file = $this->inputPayload( 'FILES' );
+            return $file[ strtolower( $name ) ] ?? '';
+        }
 		
 		public function has( string $key ): bool {
 			return array_key_exists( strtolower( $key ), $this->inputs() );
@@ -97,4 +120,16 @@
 		public function message( array $array ): void {
 			$this->setMessageProperty( $array );
 		}
+
+        public function response( int $code = 200 ): Response
+        {
+            return new Response( $code );
+        }
+
+        public function params( string $name = '' ): array|string {
+            if ( $name ) {
+                return self::$params[ $name ] ?? '';
+            }
+            return self::$params;
+        }
 	}

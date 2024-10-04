@@ -6,9 +6,12 @@
 	{
 		use FileValidation;
 		use InputValidation;
-		
+
+        # Costume params
+        protected static array $params = [];
+
 		# Inputs is used to store all the input fields submitted.
-		protected array $inputs = [];
+		protected array $payload = [];
 		
 		# All the errors response is stored here.
 		protected array $response = [];
@@ -188,24 +191,33 @@
 		protected function getInput( string $name = '' ): mixed
 		{
 			if ( !$name )
-				return $this->inputs;
+				return $this->payload;
 			
-			return $this->inputs[ strtolower( $name ) ] ?? "";
+			return $this->payload[ strtolower( $name ) ] ?? "";
 		}
+
+        protected function inputPayload( string $type ): array {
+            return $this->payload[ strtoupper( $type ) ] ?? [];
+        }
 
 		protected function getMethod(): string {
 			return $_SERVER[ 'REQUEST_METHOD' ];
 		}
 		
-		protected function setInputRequest(): void 
+		protected function setInputPayload(): void
 		{
-			$this->request[ "GET" ] = array_change_key_case( $_GET, CASE_UPPER );
-			$this->request[ "POST" ] = array_change_key_case( $_POST, CASE_UPPER );
-			$this->request[ "FILES" ] = array_change_key_case( $_FILES, CASE_UPPER );
-		} 
+            $jsonData = ( strpos( $_SERVER[ 'CONTENT_TYPE' ] ?? '', 'application/json' ) !== false ) ? file_get_contents( 'php://input' ) : '';
+            $this->payload[ "GET" ] = array_change_key_case( $_GET );
+            $this->payload[ "POST" ] = array_change_key_case( $_POST );
+            $this->payload[ "FILES" ] = array_change_key_case( $_FILES );
+            $this->payload[ "JSON" ] = array_change_key_case( json_decode( $jsonData, true ) ?? [] );
 
-		protected function setInputProperty(): void {
-			$this->inputs = array_change_key_case( $_GET + $_FILES + $_POST  );
+            $this->payload = [
+                ...$this->payload[ "GET" ],
+                ...$this->payload[ "POST" ],
+                ...$this->payload[ "FILES" ],
+                ...$this->payload[ "JSON" ]
+            ];
 		}
 
 		protected function setMessage( string $key, string $message = '', string|int|null $input_key = null ): void
@@ -229,4 +241,23 @@
 		protected function setMessageProperty( array $array ): void {
 			$this->message = $array;
 		}
+
+        public function setParams( array $params ): void {
+            self::$params = $params;
+        }
+
+        public function include( string $directory ): void {
+            if ( !is_dir( $directory ) )
+                return;
+
+            $files = scandir( $directory) ;
+            $files = array_diff( $files, [ '.', '..' ]);
+            foreach ( $files as $file ) {
+                $filePath = $directory . DIRECTORY_SEPARATOR . $file;
+
+                if ( is_file( $filePath ) && pathinfo( $filePath, PATHINFO_EXTENSION ) === 'php' ) {
+                    require_once $filePath;
+                }
+            }
+        }
 	}

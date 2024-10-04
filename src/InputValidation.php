@@ -4,7 +4,7 @@
 	
 	trait InputValidation
 	{
-		private function validateMin( string $value, int $min, string|int|null &$key = null ): bool
+		private function validateMin( array|string $value, int $min, string|int|null &$key = null ): bool
 		{
 			if ( is_array( $value ) ) {
 				foreach ( $value as $input_key => $key_value ) {
@@ -22,7 +22,7 @@
 			return true;
 		}
 		
-		private function validateMax( string $value, int $max, string|int|null &$key = null ): bool
+		private function validateMax( array|string $value, int $max, string|int|null &$key = null ): bool
 		{
 			if ( is_array( $value ) ) {
 				foreach ( $value as $input_key => $key_value ) {
