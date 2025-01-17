@@ -12,10 +12,15 @@
 		private Request $request;
 		private array $validate;
 		private bool $isSuccess;
+		private array $messages = [];
 		private array $response = [];
+		private bool $validated = false;
 
 		protected function validate(): bool
 		{
+			if ($this->validated)
+				return $this->getStatus();
+
 			$request = $this->request;
 			foreach ($this->validate as $inputKey => $rules) {
 
@@ -37,7 +42,7 @@
 							$result = Files::validate($inputValue)->$rule($ruleValue);
 
 							if (!$result) {
-								$this->response[$inputKey] = Messages::fetch($inputKey)->$rule($ruleValue);
+								$this->registerResponse($inputKey, $rule, $ruleValue);
 							}
 						}
 					} else {
@@ -45,14 +50,30 @@
 							$result = Inputs::validate($inputValue)->$rule($ruleValue);
 
 							if (!$result) {
-								$this->response[$inputKey] = Messages::fetch($inputKey)->$rule($ruleValue);
+								$this->registerResponse($inputKey, $rule, $ruleValue);
 							}
 						}
 					}
 				}
 			}
 
-			return false;
+			$this->validated = true;
+			return $result ?? true;
+		}
+
+		protected function registerResponse(string $inputKey, string $rule,mixed $ruleValue): void
+		{
+			if (isset($this->messages[$inputKey][$rule])) {
+				$this->response[$inputKey] = $this->messages[$inputKey][$rule];
+				return;
+			}
+
+			$this->response[$inputKey] = Messages::fetch($inputKey)->$rule($ruleValue);
+		}
+
+		protected function registerMessages(array $messages): void
+		{
+			$this->messages = $messages;
 		}
 
 		protected function registerValidate(array $validate): void
