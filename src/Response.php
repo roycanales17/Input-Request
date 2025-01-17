@@ -1,48 +1,75 @@
 <?php
 
-    namespace App\Http\Requests;
+	namespace App\Headers;
 
-    class Response {
+	use JetBrains\PhpStorm\NoReturn;
 
-        protected int $code;
-        protected string $charset;
+	class Response
+	{
+		private mixed $content;
+		private int $statusCode;
+		private array $headers;
 
-        function __construct( int $code = 200, string $charset = 'UTF-8' ) {
-            header( "HTTP/1.1 $code {$this->getStatusMessage( $code )}" );
-            $this->charset = $charset;
-        }
+		function __construct(mixed $content = '', int $statusCode = 200, array $headers = [])
+		{
+			$this->content = $content;
+			$this->statusCode = $statusCode;
+			$this->headers = $headers;
 
-        function json( mixed $data = '' ): string|false {
-            header( "Content-Type: application/json; charset={$this->charset}", true, $this->code );
-            $jsonResponse = json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE );
+			http_response_code($this->statusCode);
 
-            if ( $jsonResponse === false ) {
-                $error[ 'error' ] = 'Failed to encode data to JSON';
-                $error[ 'details' ] = json_last_error_msg();
-                http_response_code( 500 );
-                return json_encode( $error, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE );
-            }
-            return $jsonResponse;
-        }
+			foreach ($this->headers as $name => $value) {
+				$this->header($name, $value);
+			}
+		}
 
-        function html( mixed $data = '' ): string {
-            header( "Content-Type: text/html; charset={$this->charset}", true, $this->code );
+		public function header(string $key, mixed $value): self
+		{
+			header("$key: $value");
+			return $this;
+		}
 
-            if ( is_array( $data ) || is_object( $data ) ) {
-                return '<pre>' . htmlspecialchars( json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ), ENT_QUOTES, 'UTF-8' ) . '</pre>';
-            }
-            return htmlspecialchars( (string) $data, ENT_QUOTES, 'UTF-8' );
-        }
+		public function send(): void
+		{
+			if ($this->content) {
+				if (is_array($this->content)) {
+					echo json_encode($this->content);
+				} else {
+					echo $this->content;
+				}
+			}
+		}
 
-        protected function getStatusMessage( int $code ): string {
-            $statusMessages = [
-                200 => 'OK',
-                400 => 'Bad Request',
-                401 => 'Unauthorized',
-                403 => 'Forbidden',
-                404 => 'Not Found',
-                500 => 'Internal Server Error'
-            ];
-            return $statusMessages[ $code ] ?? 'Unknown Status Code';
-        }
-    }
+		public function download(string $filename, mixed $content = null): void
+		{
+			if ($content === null) {
+				throw new \Exception('Content must be provided for the download.');
+			}
+
+			$this->header('Content-Type', 'application/octet-stream');
+			$this->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+			$this->header('Content-Length', strlen($content));
+
+			echo $content;
+		}
+
+		#[NoReturn] public function redirect(string $url, int $statusCode = 302): void
+		{
+			header("Location: $url", true, $statusCode);
+			exit();
+		}
+
+		public function file(string $filename): void
+		{
+			if (file_exists($filename)) {
+				$this->header('Content-Type', mime_content_type($filename));
+				$this->header('Content-Disposition', 'inline; filename="' . basename($filename) . '"');
+				$this->header('Content-Length', filesize($filename));
+
+				readfile($filename);
+			} else {
+				http_response_code(404);
+				echo 'File Not Found';
+			}
+		}
+	}

@@ -19,7 +19,10 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\Http\\Requests\\": "src/"
+            "App\\Headers\\": "src/",
+            "App\\Headers\\Scheme\\": "src/scheme",
+            "App\\Headers\\Scheme\\Validation\\": "src/scheme/validation",
+            "App\\Headers\\Requests\\": "src/requests"
         }
     }
 }
