@@ -2,7 +2,7 @@
 
 	namespace App\Headers;
 
-	use JetBrains\PhpStorm\NoReturn;
+	use SimpleXMLElement;
 
 	class Response
 	{
@@ -29,15 +29,103 @@
 			return $this;
 		}
 
-		public function send(): void
+		public function html(): string
 		{
-			if ($this->content) {
-				if (is_array($this->content)) {
-					echo json_encode($this->content);
-				} else {
-					echo $this->content;
+			$this->header('Content-Type', 'text/html; charset=UTF-8');
+			return (string) $this->content;
+		}
+
+		public function json(): string
+		{
+			$this->header('Content-Type', 'application/json; charset=UTF-8');
+			return json_encode($this->content, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		}
+
+		public function text(): string
+		{
+			$this->header('Content-Type', 'text/plain; charset=UTF-8');
+			return (string) $this->content;
+		}
+
+		public function javascript(): string
+		{
+			$this->header('Content-Type', 'application/javascript; charset=UTF-8');
+			return (string) $this->content;
+		}
+
+		public function css(): string
+		{
+			$this->header('Content-Type', 'text/css; charset=UTF-8');
+			return (string) $this->content;
+		}
+
+		public function csv(): string
+		{
+			$this->header('Content-Type', 'text/csv; charset=UTF-8');
+			$this->header('Content-Disposition', 'attachment; filename="export.csv"');
+
+			$csv = '';
+			if (is_array($this->content)) {
+				foreach ($this->content as $row) {
+					$csv .= implode(',', $row) . "\n";
 				}
 			}
+			return $csv;
+		}
+
+		public function pdf(): string
+		{
+			$this->header('Content-Type', 'application/pdf');
+			$this->header('Content-Disposition', 'attachment; filename="file.pdf"');
+
+			return (string) $this->content;
+		}
+
+		public function image(string $type = 'jpeg'): string
+		{
+			$mimeTypes = [
+				'jpeg' => 'image/jpeg',
+				'png' => 'image/png',
+				'gif' => 'image/gif',
+			];
+
+			if (!isset($mimeTypes[$type])) {
+				$type = 'jpeg';
+			}
+
+			$this->header('Content-Type', $mimeTypes[$type]);
+			return (string) $this->content;
+		}
+
+		public function audio(string $type = 'mpeg'): string
+		{
+			$mimeTypes = [
+				'mpeg' => 'audio/mpeg',
+				'ogg' => 'audio/ogg',
+			];
+
+			if (!isset($mimeTypes[$type])) {
+				$type = 'mpeg';
+			}
+
+			$this->header('Content-Type', $mimeTypes[$type]);
+			return (string) $this->content;
+		}
+
+		public function multipart(): string
+		{
+			$this->header('Content-Type', 'multipart/form-data');
+			return (string) $this->content;
+		}
+
+		public function xml(): string
+		{
+			$this->header('Content-Type', 'application/xml; charset=UTF-8');
+
+			$xml = new SimpleXMLElement('<root/>');
+			$this->arrayToXml($this->content, $xml);
+
+			return $xml->asXML();
 		}
 
 		public function download(string $filename, mixed $content = null): void
@@ -53,7 +141,7 @@
 			echo $content;
 		}
 
-		#[NoReturn] public function redirect(string $url, int $statusCode = 302): void
+		public function redirect(string $url, int $statusCode = 302): void
 		{
 			header("Location: $url", true, $statusCode);
 			exit();
@@ -70,6 +158,18 @@
 			} else {
 				http_response_code(404);
 				echo 'File Not Found';
+			}
+		}
+
+		private function arrayToXml(array $data, SimpleXMLElement $xml): void
+		{
+			foreach ($data as $key => $value) {
+				if (is_array($value)) {
+					$subnode = $xml->addChild($key);
+					$this->arrayToXml($value, $subnode);
+				} else {
+					$xml->addChild($key, htmlspecialchars((string) $value));
+				}
 			}
 		}
 	}

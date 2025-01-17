@@ -16,7 +16,7 @@
 			return new Validate($config);
 		}
 
-		public function response(mixed $content, int $status = 200, array $headers = []): Response
+		public function response(mixed $content = '', int $status = 200, array $headers = []): Response
 		{
 			return new Response($content, $status, $headers);
 		}
