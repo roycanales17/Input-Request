@@ -10,7 +10,7 @@
 
 		public function requestHeaders(): BaseHeaders
 		{
-			return new BaseHeaders(self::$headersCache ?? self::$headersCache = self::fetch('headers'));
+			return new BaseHeaders(self::$headersCache ?: self::$headersCache = self::fetch('headers'));
 		}
 
 		public static function headers(): array
