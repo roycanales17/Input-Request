@@ -23,6 +23,9 @@
             "App\\Headers\\Scheme\\": "src/scheme",
             "App\\Headers\\Scheme\\Validation\\": "src/scheme/validation",
             "App\\Headers\\Requests\\": "src/requests"
-        }
+        },
+        "files": [
+            "src/Standard.php"
+        ]
     }
 }
