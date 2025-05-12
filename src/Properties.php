@@ -26,6 +26,19 @@
 
 		private static function processSuperGlobals(): void
 		{
+			if (!function_exists('getallheaders')) {
+				function getallheaders() {
+					$headers = [];
+					foreach ($_SERVER as $name => $value) {
+						if (str_starts_with($name, 'HTTP_')) {
+							$header = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
+							$headers[$header] = $value;
+						}
+					}
+					return $headers;
+				}
+			}
+
 			$sources = [
 				'query' => $_GET,
 				'post' => $_POST,
