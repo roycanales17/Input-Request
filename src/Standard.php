@@ -13,7 +13,7 @@
 		return new Response($content, $status, $headers);
 	}
 
-	function redirect(string $url, int $status = 302): void
+	function redirect(string $url, int $status = 302, array $headers = []): void
 	{
-		response()->redirect($url, $status);
+		response(status: $status, headers: $headers)->redirect($url);
 	}

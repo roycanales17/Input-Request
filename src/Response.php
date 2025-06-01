@@ -25,7 +25,7 @@
 
 		public function header(string $key, mixed $value): self
 		{
-			header("$key: $value");
+			header("$key: $value", true, $this->statusCode);
 			return $this;
 		}
 
@@ -35,10 +35,14 @@
 			return (string) $this->content;
 		}
 
-		public function json(): string
+		public function json(mixed $value = ''): string
 		{
+			$content = $this->content;
+			if ($value)
+				$content = $value;
+
 			$this->header('Content-Type', 'application/json; charset=UTF-8');
-			return json_encode($this->content, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+			return json_encode($content, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 		}
 
 		public function text(): string
@@ -141,9 +145,30 @@
 			echo $content;
 		}
 
-		public function redirect(string $url, int $statusCode = 302): void
+		public function redirect(string $url): void
 		{
-			header("Location: $url", true, $statusCode);
+			$statusCode = $this->statusCode;
+			$url = filter_var($url, FILTER_SANITIZE_URL);
+
+			$validCodes = [301, 302, 303, 307, 308];
+			if (!in_array($statusCode, $validCodes, true)) {
+				$this->statusCode = 302;
+			}
+
+			// Detect AJAX request
+			$isAjax = (
+				!empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+				strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
+			);
+
+			if ($isAjax) {
+
+				// Output JSON and exit
+				exit($this->json(['redirect' => $url]));
+			}
+
+			// Set HTTP header for normal redirect
+			header("Location: $url", true, $this->statusCode);
 			exit();
 		}
 
