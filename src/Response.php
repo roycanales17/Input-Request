@@ -150,16 +150,17 @@
 			$statusCode = $this->statusCode;
 			$url = filter_var($url, FILTER_SANITIZE_URL);
 
-			$validCodes = [301, 302, 303, 307, 308];
-			if (!in_array($statusCode, $validCodes, true)) {
-				$this->statusCode = 302;
-			}
-
 			// Detect AJAX request
 			if (Request::header('HTTP_X_REQUESTED_WITH')) {
 
 				// Output JSON and exit
 				exit($this->json(['redirect' => $url]));
+			}
+
+			// Validate Codes
+			$validCodes = [301, 302, 303, 307, 308];
+			if (!in_array($statusCode, $validCodes, true)) {
+				$this->statusCode = 302;
 			}
 
 			// Set HTTP header for normal redirect
