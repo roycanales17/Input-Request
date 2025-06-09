@@ -59,7 +59,7 @@
 			}
 
 			$this->validated = true;
-			return $this->failed;
+			return !$this->failed;
 		}
 
 		protected function registerResponse(string $inputKey, string $rule,mixed $ruleValue): void
