@@ -12,6 +12,7 @@
 		private Request $request;
 		private array $validate;
 		private bool $isSuccess;
+		private bool $failed = false;
 		private array $messages = [];
 		private array $response = [];
 		private bool $validated = false;
@@ -58,11 +59,12 @@
 			}
 
 			$this->validated = true;
-			return $result ?? true;
+			return $this->failed;
 		}
 
 		protected function registerResponse(string $inputKey, string $rule,mixed $ruleValue): void
 		{
+			$this->failed = true;
 			if (isset($this->messages[$inputKey][$rule])) {
 				$this->response[$inputKey] = $this->messages[$inputKey][$rule];
 				return;
