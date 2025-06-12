@@ -80,4 +80,8 @@
 		public function not_in($value): bool {
 			return !$this->in($value);
 		}
+
+		public function numeric(): bool {
+			return is_numeric($this->value);
+		}
 	}
