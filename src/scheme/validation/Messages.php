@@ -112,4 +112,8 @@
 		public function dimensions($value): string {
 			return "{$this->key} file must meet the required dimensions: {$value}. Please ensure the width and height are within the allowed range.";
 		}
+
+		public function numeric($value): string {
+			return "{$this->key} must be a valid number.";
+		}
 	}
