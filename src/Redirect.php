@@ -16,7 +16,7 @@
 		/**
 		 * Flash data to the session for the next request.
 		 */
-		public function with(string|array $key, mixed $value = null): self
+		public function with(string|array $key, mixed $value = null): bool
 		{
 			if (class_exists('App\\Utilities\\Session') && method_exists('App\\Utilities\\Session', 'flash')) {
 				if (is_array($key)) {
@@ -28,31 +28,34 @@
 				}
 			}
 
-			return $this;
+			$this->send();
+			return true;
 		}
 
 		/**
 		 * Flash validation or system errors.
 		 */
-		public function withErrors(string|array $errors): self
+		public function withErrors(string|array $errors): bool
 		{
 			if (class_exists('App\\Utilities\\Session') && method_exists('App\\Utilities\\Session', 'flash')) {
 				\App\Utilities\Session::flash('errors', (array) $errors);
 			}
 
-			return $this;
+			$this->send();
+			return true;
 		}
 
 		/**
 		 * Flash success messages.
 		 */
-		public function withSuccess(string $message): self
+		public function withSuccess(string $message): bool
 		{
 			if (class_exists('App\\Utilities\\Session') && method_exists('App\\Utilities\\Session', 'flash')) {
 				\App\Utilities\Session::flash('success', $message);
 			}
 
-			return $this;
+			$this->send();
+			return true;
 		}
 
 		/**
@@ -118,13 +121,5 @@
 
 			header("Location: $url", true, $code);
 			exit();
-		}
-
-		/**
-		 * Automatically send redirect on destruct (fallback).
-		 */
-		public function __destruct()
-		{
-			$this->send();
 		}
 	}
