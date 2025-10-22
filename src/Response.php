@@ -145,27 +145,9 @@
 			echo $content;
 		}
 
-		public function redirect(string $url): void
+		public function redirect(string $url): Redirect
 		{
-			$statusCode = $this->statusCode;
-			$url = filter_var($url, FILTER_SANITIZE_URL);
-
-			// Detect AJAX request
-			if (Request::header('HTTP_X_REQUESTED_WITH')) {
-
-				// Output JSON and exit
-				exit($this->json(['redirect' => $url]));
-			}
-
-			// Validate Codes
-			$validCodes = [301, 302, 303, 307, 308];
-			if (!in_array($statusCode, $validCodes, true)) {
-				$this->statusCode = 302;
-			}
-
-			// Set HTTP header for normal redirect
-			header("Location: $url", true, $this->statusCode);
-			exit();
+			return new Redirect($url);
 		}
 
 		public function file(string $filename): void

@@ -1,5 +1,6 @@
 <?php
 
+	use App\Headers\Redirect;
 	use App\Headers\Request;
 	use App\Headers\Response;
 
@@ -13,7 +14,7 @@
 		return new Response($content, $status, $headers);
 	}
 
-	function redirect(string $url, int $status = 302, array $headers = []): void
+	function redirect(string $url, int $status = 302, array $headers = []): Redirect
 	{
-		response(status: $status, headers: $headers)->redirect($url);
+		return response(status: $status, headers: $headers)->redirect($url);
 	}
