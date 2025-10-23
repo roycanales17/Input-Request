@@ -4,6 +4,7 @@
 
 	use App\Utilities\Session;
 	use App\Utilities\Server;
+	use JetBrains\PhpStorm\NoReturn;
 
 	class Redirect
 	{
@@ -102,13 +103,13 @@
 		/**
 		 * Send the redirect response.
 		 */
-		public function send(): never
+		#[NoReturn] public function __destruct()
 		{
 			$url = filter_var($this->url, FILTER_SANITIZE_URL);
 			$code = in_array($this->code, [301, 302, 303, 307, 308]) ? $this->code : 302;
 
 			// If AJAX, return JSON
-			$isAjax = ( class_exists(Server::class) && Server::isAjaxRequest() ) ||  strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'xmlhttprequest';
+			$isAjax = (class_exists(Server::class) && Server::isAjaxRequest() ) ||  strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'xmlhttprequest';
 
 			if ($isAjax) {
 				$flashData = [];
